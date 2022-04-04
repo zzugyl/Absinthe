@@ -7,14 +7,15 @@
  * CK2～9  内部   -> HW.ts
  */
 
-import axios from 'axios';
-import {logs} from './utils/jinli_log';
-import {sendNotify} from './sendNotify';
-import {getRandomNumberByRange, getshareCodeHW, o2s, randomString, requireConfig, wait} from "./TS_USER_AGENTS";
+import axios from 'axios'
+import {sendNotify} from './sendNotify'
+import {get, getshareCodeHW, o2s, randomString, requireConfig, wait} from "./TS_USER_AGENTS"
+import {Md5} from "ts-md5"
 
 let cookie: string = '', cookiesArr: string[] = [], res: any = '', UserName: string, UA: string = ''
 let shareCodesSelf: string[] = [], shareCodes: string[] = [], shareCodesHW: string[] = [], fullCode: string[] = []
-let min: number[] = [0.02, 0.12, 0.3, 0.4, 0.6, 0.7, 0.8, 1, 1.2, 2, 3.6], log: string = ''
+let min: number[] = [0.02, 0.12, 0.3, 0.4, 0.6, 0.7, 0.8, 1, 1.2, 2, 3.6]
+let log: string = ''
 
 !(async () => {
   cookiesArr = await requireConfig(false)
@@ -22,15 +23,15 @@ let min: number[] = [0.02, 0.12, 0.3, 0.4, 0.6, 0.7, 0.8, 1, 1.2, 2, 3.6], log: 
   await join()
   await getShareCodeSelf()
   await help()
-  await open(false)
+  // await open(false)
 })()
 
 async function getShareCodeSelf() {
   for (let [index, value] of cookiesArr.entries()) {
     try {
-      cookie = value;
+      cookie = value
       UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
-      console.log(`\n开始【京东账号${index + 1}】${UserName}\n`);
+      console.log(`\n开始【京东账号${index + 1}】${UserName}\n`)
       UA = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
       res = await api('h5activityIndex', {"isjdapp": 1})
       console.log('红包ID：', res.data.result.redpacketInfo.id)
@@ -46,16 +47,22 @@ async function getShareCodeSelf() {
 async function join() {
   for (let [index, value] of cookiesArr.entries()) {
     try {
-      cookie = value;
+      cookie = value
       UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
-      console.log(`\n开始【京东账号${index + 1}】${UserName}\n`);
-      UA = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
-      log = logs[getRandomNumberByRange(0, logs.length - 1)]
-
-      let random = log.match(/"random":"(\d+)"/)[1], log1 = log.match(/"log":"(.*)"/)[1]
-      res = await api('h5launch', {"followShop": 0, "random": random, "log": log1, "sceneid": "JLHBhPageh5"})
-      console.log('活动初始化：', res.data.result.statusDesc)
-      await wait(1000)
+      console.log(`\n开始【京东账号${index + 1}】${UserName}\n`)
+      for (let i = 0; i < 5; i++) {
+        try {
+          UA = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
+          log = await getLog()
+          let random = log.match(/"random":"(\d+)"/)[1], log1 = log.match(/"log":"(.*)"/)[1]
+          res = await api('h5launch', {"followShop": 0, "random": random, "log": log1, "sceneid": "JLHBhPageh5"})
+          console.log('活动初始化：', res.data.result.statusDesc)
+          await wait(1000)
+          break
+        } catch (e) {
+          await wait(3000)
+        }
+      }
     } catch (e) {
       console.log(e)
     }
@@ -70,7 +77,7 @@ async function open(autoOpen: boolean = false) {
     try {
       cookie = value
       UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
-      console.log(`\n开始【京东账号${index + 1}】${UserName}\n`);
+      console.log(`\n开始【京东账号${index + 1}】${UserName}\n`)
 
       let j: number = 1
       res = await api('h5activityIndex', {"isjdapp": 1})
@@ -84,7 +91,7 @@ async function open(autoOpen: boolean = false) {
           console.log(`红包${j}可拆`)
           if (autoOpen) {
             UA = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
-            log = logs[getRandomNumberByRange(0, logs.length - 1)]
+            log = await getLog()
             let random = log.match(/"random":"(\d+)"/)[1], log1 = log.match(/"log":"(.*)"/)[1]
             res = await api('h5receiveRedpacketAll', {"random": random, "log": log1, "sceneid": "JLHBhPageh5"})
             console.log('打开成功', parseFloat(res.data.result.discount))
@@ -105,25 +112,10 @@ async function open(autoOpen: boolean = false) {
   }
 }
 
-/**
- * +
- * 0
- * 1
- * 2
- * 3
- * 4
- * 5
- * 6
- * 7
- * 8
- * 9
- * 10
- */
-
 async function help() {
   for (let [index, value] of cookiesArr.entries()) {
     try {
-      cookie = value;
+      cookie = value
       UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
       if (shareCodesHW.length === 0) {
         shareCodesHW = await getshareCodeHW('jlhb')
@@ -142,30 +134,48 @@ async function help() {
       //   shareCodes = Array.from(new Set([...shareCodesHW, ...shareCodesSelf]))
       // }
 
+      let remain: number = 1
       for (let code of shareCodes) {
         if (!fullCode.includes(code)) {
-          UA = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
-          log = logs[getRandomNumberByRange(0, logs.length - 1)]
-          let random = log.match(/"random":"(\d+)"/)[1], log1 = log.match(/"log":"(.*)"/)[1]
-          console.log(`账号${index + 1} ${UserName} 去助力 ${code} ${shareCodesSelf.includes(code) ? '*内部*' : ''}`)
-
-          res = await api('jinli_h5assist', {"redPacketId": code, "followShop": 0, "random": random, "log": log1, "sceneid": "JLHBhPageh5"})
-          o2s(res, 'jinli_h5assist')
-
-          if (res.data.result.status === 0) {
-            console.log('助力成功：', parseFloat(res.data.result.assistReward.discount))
-            await wait(20000)
+          if (!remain) {
             break
-          } else if (res.data.result.status === 3) {
-            console.log('今日助力次数已满')
-            break
-          } else {
-            console.log('助力结果：', res.data.result.statusDesc)
-            if (res.data.result.statusDesc === '啊偶，TA的助力已满，开启自己的红包活动吧~') {
-              fullCode.push(code)
-            }
           }
-          await wait(20000)
+          for (let i = 0; i < 5; i++) {
+            UA = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
+            log = await getLog()
+            let random = log.match(/"random":"(\d+)"/)[1], log1 = log.match(/"log":"(.*)"/)[1]
+            console.log(`账号${index + 1} ${UserName} 去助力 ${code} ${shareCodesSelf.includes(code) ? '*内部*' : ''}`)
+
+            res = await api('jinli_h5assist', {"redPacketId": code, "followShop": 0, "random": random, "log": log1, "sceneid": "JLHBhPageh5"})
+            // o2s(res, 'jinli_h5assist')
+
+            if (res.rtn_code !== 0) {
+              console.log('log无效')
+            } else {
+              if (res.data.result.status === 0) {
+                console.log('助力成功：', parseFloat(res.data.result.assistReward.discount))
+                await wait(45000)
+                remain = 0
+                break
+              } else if (res.data.result.status === 3) {
+                console.log('今日助力次数已满')
+                await wait(45000)
+                remain = 0
+                break
+              } else if (res.data.result.statusDesc === '抱歉，你不能为自己助力哦') {
+                console.log('不能助力自己')
+                remain = 0
+                await wait(45000)
+                break
+              } else {
+                console.log('助力结果：', res.data.result.statusDesc)
+                if (res.data.result.statusDesc === '啊偶，TA的助力已满，开启自己的红包活动吧~') {
+                  fullCode.push(code)
+                }
+              }
+            }
+            await wait(45000)
+          }
         }
       }
     } catch (e) {
@@ -174,7 +184,7 @@ async function help() {
   }
 }
 
-async function api(fn: string, body: object, retry: number = 0) {
+async function api(fn: string, body: object) {
   let {data} = await axios.post(`https://api.m.jd.com/api?appid=jinlihongbao&functionId=${fn}&loginType=2&client=jinlihongbao&clientVersion=10.2.4&osVersion=AndroidOS&d_brand=Xiaomi&d_model=Xiaomi`, `body=${encodeURIComponent(JSON.stringify(body))}`, {
     headers: {
       "Cookie": cookie,
@@ -182,21 +192,28 @@ async function api(fn: string, body: object, retry: number = 0) {
       "referer": "https://h5.m.jd.com/babelDiy/Zeus/2NUvze9e1uWf4amBhe1AV6ynmSuH/index.html",
       'Content-Type': 'application/x-www-form-urlencoded',
       "X-Requested-With": "com.jingdong.app.mall",
-      "User-Agent": UA,
+      "User-Agent": "Mozilla/5.0 (Linux; U; Android 8.0.0; zh-cn; Mi Note 2 Build/OPR1.170623.032) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.128 Mobile Safari/537.36 XiaoMi/MiuiBrowser/10.1.1",
     }
   })
-  if (data.rtn_code === 403 && fn === 'h5receiveRedpacketAll') {
-    console.log('拆红包失败，手动去拆')
-    return {}
-  }
-  if (data.rtn_code === 403 && retry < 3) {
-    console.log('retry...')
-    await wait(1000)
-    log = logs[getRandomNumberByRange(0, logs.length - 1)]
-    body['random'] = log.match(/"random":"(\d+)"/)[1]
-    body['log'] = log.match(/"log":"(.*)"/)[1]
-    await wait(10000)
-    await api(fn, body, ++retry)
-  }
   return data
+}
+
+async function getLog() {
+  // let farm: string = await getFarmShareCode(cookie)
+  // await wait(1000)
+  // let bean: string = await getBeanShareCode(cookie)
+  // let pt_pin: string = encodeURIComponent(UserName)
+  // if (farm.length > 0 && bean.length > 0) {
+  //   res = await get(`https://api.jdsharecode.xyz/api/jlhb_log?farm=${farm}&bean=${bean}&pin=${Md5.hashStr(pt_pin)}`)
+  res = await get(`https://api.jdsharecode.xyz/api/jlhb_log?farm=farm&bean=bean&pin=pin`)
+  if (res === 1) {
+    console.log('一致性验证失败，脚本退出')
+    process.exit(0)
+  } else {
+    return res
+  }
+  // } else {
+  //   console.log('获取账号助力码失败，脚本退出')
+  //   process.exit(0)
+  // }
 }
