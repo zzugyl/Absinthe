@@ -1,10 +1,10 @@
 /*
 店铺签到，各类店铺签到，有新的店铺直接添加token即可
-搬运cui521大佬脚本，请勿外传！！！
-自带的Token List网址已不可用
-由Shy_yhS更新店铺数据，当日签到超过20家则火爆
-更新日期:2021-10-28 00:19
-cron 15 0,22 * * * jd_dpsign.js, tag=店铺签到diy
+可设置变量DPSTOKEN='A&B&C'
+会和内置的token去重合并
+每日最多签到22家店铺，超出失败
+更新日期:2022-11-6
+cron 3 0,23 * * * jd_dpsign.js, tag=店铺签到
 */
 const $ = new Env('店铺签到');
 
@@ -21,37 +21,46 @@ let vender=''
 let num=0
 let shopname=''
 
+let dptoken = [];
+if (process.env.DPSTOKEN) {
+    if (process.env.DPSTOKEN.indexOf('&')){
+        dptoken = process.env.DPSTOKEN.split('&');
+    } else {
+        dptoken.push(process.env.DPSTOKEN);
+    }
+}
+
 const token=[
-    
-  "EE77A6D921FBCB19A11A0D1B0BCCAA89",
-  "6B00C48608C4FAFA8D73FE58BC2B6099",
-  "113946C00C676DD5141D46EF6194E281",
-  "DFBDE9D4A0EF038284396FDA8535D20C",
-  "4BF0331BCB845ABC79145753E605E9C3",
-  "B5BD9A190DD6AD49A6E3646CB2700863",
-  "A75D5921DB6CF687E3F1063C0E1D94A7",
-  "D3A2F5DBC71205B3F7FB393D085A9C6C",
-  "490047103854B8B5E17D3D76C2C65D1D",
-  "F4132FED0919E26A040981E77C3FD009",
-  "833857BA916CBE17638A463C3DBAD4BB",
-  "3068C74A35718BF761F8E10F52824696",
-  "AF994FA00C2086F08849D5FB7122E79F",
-  "8C172B547FA75FEADBF342CDEBE14C36",
-  "905B05C6656CCD45807169FB682D65E4",
-  "BA61728677870801781CD5DA61719904",
-  "E20BD5091D8F70B4649D529A09183F04",
-  "48AF67C570FF4986535BF6559042E29D",
-  "B19EB262C4A4AD705862A6D6EFA8E474",
-  "9F806E7D19B3AFBEA0F33ECB32FB29B1",
-  "1B2F8250713AD30F335B092B70A4DBF5",
-  "88ECFB91288FD2DE93DDBDDAA9409D8E",
-  "032C7983152472648378B72028B62C40"
+
+    "AAE01195EA6E78F18606E032E0589B34",
+    "A544B11C76D69245B7A56B663156147E",
+    "200E941E55388DA318A9C6B98F916F83",
+    "74D73ECB1591EC90D74A1ADEE4A35CDE",
+    "BC70D9F266F7B96C7CE29D48D7B03105",
+    "86308F8157C385B04564DA8E54B81711",
+  //"D61A5DCC14FBD8FE566DE224AE730BAC",//7
+  //"74058B0E3F509C3016FCB12DC10D5FD2",//14 
+  //"B881D49A8D25321D53538973C963F19F",//7
+  //"032B7EC9D12D7113E3B1D4947CB66DFB",//3
+  //"9D112935025746239099B25CB8B1EFEE",//3
+  //"5DC67D3B65A4B7FC93799C0D2D860ACC",//3  
+  //"FB289748C2ABAA40489BC7303C22190F",//1-6
+  //"DE9A8D7AB42C6A671F2D510E3154A41D",//1-6
+  //"39B8656B4CB174DBFA196CEFFA48F2FE",//7
+  //"31CBAB091B89B07B60DBAC9B0C14EC6F",//7
+  //"10D630FF0DC274BA90DBADAFCACC481F",//5
+  //"3569C202FFF8EED2A875BC2E23DEC7F4",//7 
+  //"6F3309E6CBD50C8C4A03369FC85D58B7",//7  
+  //"ADD0B95CCD75FF794A147F9A178A7CFE",//5
+  //"FB0FC42FDA3CDB9C64A2A9C9AFFFD1BD",//3
+  //"826E626A661D2A4402CD6230C3694DEC",//1
+  //"5C1B6A780727C7C2D177380C2B6E7D0B",//1
+  //"2B1B0C6408AE5F2732888C4F09FC335E",
+  //"7071DF3D16698C8B636A9385417C0413",//5
   
   
 ]
-//IOS等用户直接用NobyDa的jd cookie
 
-$.TokenList =[];
 
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
@@ -75,13 +84,9 @@ if ($.isNode()) {
   }
   
 	$.TokenLists = []
-  
-        //$.innerTokenList = await getStoreTokee('https://zy.kejiwanjia.com/jd_dpqiandao.php');
-        $.innerTokenList = token
-	
-	$.TokenLists.push(...$.TokenList,...$.innerTokenList);
-
-	
+	$.TokenLists.push(...dptoken,...token);
+    $.TokenLists = [...new Set($.TokenLists)]
+    if ($.TokenLists.length === 0) {console.log('无店铺签到token，退出！');return};
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -117,8 +122,7 @@ if ($.isNode()) {
 async function babel_diy_zeus(){
 	
   for (var j = 0; j < $.TokenLists.length; j++) {
-	  
-	await $.wait(3000);  
+	await $.wait(1000);  
     num=j+1
     if ($.TokenLists[j]=='') {continue}
     await getvenderId($.TokenLists[j])

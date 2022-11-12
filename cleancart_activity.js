@@ -25,10 +25,10 @@ async function clean(ck,url,goodsArr){
       if(!ck) return ''
       if(!jdSignUrl) jdSignUrl = url
       cookie = ck
-      if(jdSignUrl.indexOf("://jd.11111118/") > -1) {
-        resolve(msg)
-        return false
-      }
+      // if(jdSignUrl.indexOf("://jd.11111118/") > -1) {
+      //   resolve(msg)
+      //   return false
+      // }
       let signBody = `{"homeWishListUserFlag":"1","userType":"0","updateTag":true,"showPlusEntry":"2","hitNewUIStatus":"1","cvhv":"049591","cartuuid":"hjudwgohxzVu96krv/T6Hg==","adid":""}`
       let body = await jdSign('cartClearQuery', signBody)
       if(out) return
@@ -149,6 +149,9 @@ function jdApi(functionId,body) {
             if(res.mainTitle) console.log(res.mainTitle)
             if(res.resultCode == 0){
               resolve(res);
+            }else if (res.tips && res.tips.includes("正在努力加载")){
+              console.log("请求太快，ip被限制了")
+              out = true
             }
           }
         } catch (e) {

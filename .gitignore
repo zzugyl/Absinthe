@@ -1,4 +1,5 @@
 model
+/.idea
 /code
 /.github
 /images
@@ -12,6 +13,8 @@ jd_update.js
 package-lock.json
 jd_enen.js
 jd_checkCK.js
+
+jd_lzdz1_customized5_18 2.js
 
 shell
 README.MD
@@ -36,17 +39,17 @@ jd_joypark_task.js
 jd_work_ddworld.js
 jd_esManager.js
 #清理购物车
-#jd_cleancart.js
-jd_clean_car.js
+jd_cleancart.js
+#jd_clean_car.js
 gua_cleancart.js
 jd_jmsign.js
-jd_clean_car.js
+#jd_clean_car.js
 jd_priceProtect.js
 jd_jin_tie_xh.js
 jd_jmzhl.js
 jd_zsign.js
 jd_big_winner_Mod.js	
-jd_tyt_ks.js
+#jd_tyt_ks.js
 jd_MovementFaker.js	
 gua_city.js
 # 城城分现金
@@ -70,6 +73,8 @@ jd_1111.js
 jd_nhjred.js
 jd_nhs_red.js
 gua_nhjRed.js
+*******red.js
+!jd_speed_signred.js
 # 年货节红包
 jd_nhRed.js
 jd_nhjRed.js
@@ -79,19 +84,23 @@ jd_nh_red.js
 jd_nh_sign.js
 jd_Red.js
 ##
-jd_disable.py
+
 jd_dreamFactory2.js
 jd_selectionOfficer.js
 jd_cfd2.js
 jd_notifyHe1pu.js
-jd_computer.js
+#电脑配件
+#jd_computer.js
 jd_ks_fruit.js
 jdCookie_xh.js
 #会员开卡赢京豆
 jd_opencardjoyjd.js
 #KR开卡
-jd_opencard*.js
+#
 jd_bean_change_xh.js
+#禁用重复任务
+jd_identicalnew.py 
+gua_*.js
 #月资产
 #jd_bean_change1.js
 jd_bean_change_pro.js
@@ -101,7 +110,7 @@ jd_exchange_joy.js
 # 东东世界兑换
 #jd_ddworld_exchange.js
 jdd_jd_fcdyj.js
-jd_zjd.js
+#jd_zjd.js
 jd_qjdSupermarket.js
 jd_drawEntrance.js
 jd_dreamfactory_tuan.js
@@ -160,6 +169,9 @@ jd_rush_vibo.js
 jd_fcwb_auto.js
 jd_fcwb_wb.js
 
+jd_opencard[0-9][0-9].js
+!jd_opencardL*.js
+jd_opencard[0-9][0-9][0-9][0-9]*.js
 
 jd_carnivalcity_help.js
 jd_jddt.js
@@ -181,6 +193,23 @@ jd_jx_factory.js
 
 m_*.js
 ######重复脚本#######
+#组队
+jd_teamMN.js
+jd_teamFLP.js
+jd_teamXAY.js
+jd_sevenDay_info.js 
+
+jd_plantBean_Mod.js
+#种豆得豆互助版
+jd_lzdz1_customized5_18 2.js
+jd_??-?.js
+#集魔方
+jd_jmofang.js
+bot_*.js
+#清空购物车
+gua_cleancart_ddo.js
+jd_gua_cleancart_Panda.js
+jd_15-8.js
 jd_speed_10_4.js
 jd_speed_19_6.js
 jd_speed_29_8.js
@@ -314,18 +343,22 @@ jd_plusLottery.js
 #6dylan6仓库重复的
 jd_cfd.hb.js
 jd_dddh.js
-jd_farm_automation.js
+#jd_farm_automation.js
 jd_indeps.sh
 jd_sharecode.sh
 jd_tyt_ck1.js
 jd_jsqdtx.js
-jd_farautomation.js
+#jd_farautomation.js
 jd_ms_sign.js
 jd_plusdraw.js
 #京喜工厂商品
 jx_factory_commodity.js
 ########过期活动##############
-
+#特务集卡
+jd_superBrandJK.js
+gua_opencard129.js
+gua_opencard13?.js
+jd_carnivalcity.js
 # 运动户外盲盒
 jd_UnknownTask5.js
 jd_hwmh.js
@@ -350,17 +383,33 @@ jd_mhyyl_sendCard.js
 #新春击鼓助力
 gua_HappyNewYear_Shares.js
 #头文字
-jd_mpdzcar.js
-jd_mpdzcar_*.js
+#jd_mpdzcar.js
+#jd_mpdzcar_*.js
+jd_mpdzcarJ.js
+jd_carplay.js
+jd_mpdz_car.js
 #推一推
 #jd_tyt.js
 #38节相关脚本
 jd_38qd.js
 jd_ghnsjd.js
-
-
+#组队脚本
+jd_captian_*.js
+jd_april*.js
 
 ############不能跑的###############
+#注销京东会员卡
+jd_unbind.js
+
+jd_cash_Mod_Panda.js	
+#panda签到领现金
+jd_joy_park_Mod.js
+#养joy
+jd_cash.ts
+#内容鉴赏
+jd_connoisseur.js
+jd_10_4.js
+jd_speed_15_8.js
 #领券中心签到
 jd_ccSign.js
 
